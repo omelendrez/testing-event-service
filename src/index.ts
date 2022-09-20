@@ -43,7 +43,7 @@ sqs.createQueue({
     isAppOpen: true
   };
 
-for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 1; i++) {
     console.log(`Sending message #${i + 1}`);
     sqs.sendMessage({
       MessageBody: JSON.stringify(messageBody),
