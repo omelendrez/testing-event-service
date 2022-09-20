@@ -37,13 +37,13 @@ sqs.createQueue({
   }
   const queueUrl = data.QueueUrl;
 
-  for (let i = 0; i < 10; i++) {
-    const messageBody = {
-      userId: 'UBgRDFxrT4Ovg4DtwJTzOQ',
-      isHost: true,
-      isAppOpen: true
-    };
+  const messageBody = {
+    userId: 'UBgRDFxrT4Ovg4DtwJTzOQ',
+    isHost: true,
+    isAppOpen: true
+  };
 
+for (let i = 0; i < 1; i++) {
     console.log(`Sending message #${i + 1}`);
     sqs.sendMessage({
       MessageBody: JSON.stringify(messageBody),
