@@ -16,23 +16,13 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "forceConsistentCasingInFileNames": true,
-    "importsNotUsedAsValues": "error",
     "rootDir": "./src",
     "outDir": "./dist",
-    "lib": [
-      "es2020",
-      "esnext.asynciterable",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["es2020", "esnext.asynciterable", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "types/*"
-      ]
+      "*": ["types/*"]
     }
   },
-  "include": [
-    "./src/**/*"
-  ]
+  "include": ["./src/**/*"]
 }
