@@ -1,72 +1,83 @@
-import AWS from 'aws-sdk'
-import crypto from 'crypto'
-require('dotenv').config()
+import readline from 'readline'
+import { queueName } from './config/envVars'
+import { listQueues, createQueue } from './controllers/queues'
+import {
+  deleteAllMessages,
+  readMessages,
+  sendMessage
+} from './controllers/messages'
 
-const url = process.env.AWS_ENDPOINT
+let queueURL: string
 
-if (!url) {
-  throw Error('Missing AWS endpoint')
+if (process.stdin.isTTY) {
+  process.stdin.setRawMode(true)
 }
 
-const config = {
-  endpoint: new AWS.Endpoint(url),
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: 'us-east-1',
-  apiVersion: '2012-11-05'
-}
+process.stdin.on('keypress', (_, key) => {
+  switch (key.name) {
+    case 's':
+      sendMessage(queueURL)
+        .then((resp) => {
+          console.log(resp)
+          console.log()
+        })
+        .catch((error) => console.error(error))
+      break
 
-const sqs = new AWS.SQS(config)
+    case 'r':
+      readMessages(queueURL)
+        .then((data) => {
+          data?.length
+            ? data?.forEach((resp: any) => console.log(resp))
+            : console.log('Queue is empty!')
+          console.log(`${data?.length || 0} messages`)
+          console.log()
+        })
+        .catch((error) => console.error(error))
 
-const name = process.env.INCOMING_QUEUE_NAME
+      break
 
-if (!name) {
-  throw Error('Missing queue name')
-}
+    case 'd':
+      deleteAllMessages(queueURL)
+        .then((resp) => {
+          console.log(resp)
+          console.log()
+        })
+        .catch((error) => console.error(error))
 
-console.log(name)
+      break
 
-const messageGroupId = crypto.randomUUID()
-
-sqs.createQueue(
-  {
-    QueueName: name,
-    Attributes: {
-      FifoQueue: 'true'
-    }
-  },
-  async (err: any, data: any) => {
-    if (err) {
-      console.error(err)
-      return
-    }
-    const queueUrl = data.QueueUrl
-
-    const messageBody = {
-      userId: 'UBgRDFxrT4Ovg4DtwJTzOQ',
-      isHost: true,
-      isAppOpen: true
-    }
-
-    for (let i = 0; i < 1; i++) {
-      console.log(`Sending message #${i + 1}`)
-      sqs.sendMessage(
-        {
-          MessageBody: JSON.stringify(messageBody),
-          MessageDeduplicationId: crypto.randomUUID(),
-          MessageGroupId: messageGroupId,
-
-          MessageAttributes: {
-            eventName: { StringValue: 'userJoinedMeeting', DataType: 'String' }
-          },
-          QueueUrl: queueUrl!
-        },
-        (err, data) => {
-          if (err) {
-            console.log('SendMessage callback: err, data:', err, data)
-          }
-        }
-      )
-    }
+    case 'q':
+      console.log('Exiting...')
+      process.exit(0)
   }
-)
+})
+
+listQueues()
+  .then((queues) => {
+    const queueExists = queues.find((q: string) => q.includes(queueName))
+
+    if (!queueExists) {
+      createQueue(queueName)
+    } else {
+      queueURL = queueExists
+      console.log('-'.repeat(100))
+      console.log(`Queue ${queueName} exists!`)
+      console.log('-'.repeat(100))
+
+      console.log(`Press 's' key to send a message to the queue in AWS cloud`)
+      console.log(`Press 'r' key to read messages from the queue in AWS cloud`)
+      console.log(
+        `Press 'd' key to delete all messages from the queue in AWS cloud`
+      )
+      console.log('-'.repeat(100))
+      console.log(`Press 'q' to exit the app`)
+      console.log()
+    }
+  })
+  .catch((error: any) => {
+    console.error(error)
+    process.exit(0)
+  })
+
+readline.emitKeypressEvents(process.stdin)
