@@ -1,30 +1,10 @@
 import { IMessageBody, Person } from '../entities'
+import { rounders, patients } from '../data'
 
 export const NAME_TYPE = {
   ROUNDER: 1,
   PATIENT: 2
 }
-
-const patients: Person[] = [
-  { id: 1, name: 'Jacqueline Mcgowan' },
-  { id: 2, name: 'Sean Thai' },
-  { id: 3, name: 'Journey Fain' },
-  { id: 4, name: 'Rose Sprague' },
-  { id: 5, name: 'Isabel Manuel' },
-  { id: 6, name: 'Theodore Sanford' },
-  { id: 7, name: 'Silas Ginn' },
-  { id: 8, name: 'Isla Flick' },
-  { id: 9, name: 'Duane Warren' },
-  { id: 10, name: 'Judy Magee' }
-]
-
-const rounders: Person[] = [
-  { id: 1, name: 'Joyce Nevarez' },
-  { id: 2, name: 'Isabel Glick' },
-  { id: 3, name: 'Scott Mayer' },
-  { id: 4, name: 'Neal Barry' },
-  { id: 5, name: 'Bentley Burrows' }
-]
 
 export const abbreviateName = (fullName: string): string => {
   const [firstName, lastName] = fullName.split(' ')

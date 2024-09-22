@@ -17,18 +17,21 @@ process.stdin.on('keypress', (_, key) => {
   switch (key.name) {
     case 's':
       sendMessage(queueURL)
-        .then((resp) => {
-          console.log(resp)
+        .then((messageId: string) => {
+          console.log('\x1b[36m%s\x1b[0m', messageId)
           console.log()
         })
         .catch((error) => console.error(error))
+
       break
 
     case 'r':
       readMessages(queueURL)
         .then((data) => {
           data?.length
-            ? data?.forEach((resp: any) => console.log(resp))
+            ? data?.forEach((resp: string | undefined) =>
+                console.log('\x1b[33m%s\x1b[0m', resp)
+              )
             : console.log('Queue is empty!')
           console.log(`${data?.length || 0} messages`)
           console.log()
